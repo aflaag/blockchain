@@ -34,7 +34,7 @@ impl Transaction {
 		self.hash = hasher
 			.finalize()[..]
 			.try_into()
-			.expect("I have no clue what the problem is I'm sorry");
+			.expect("Error generating the SHA-512 hash for the transaction.");
 	}
 	
 	pub fn validate(&self, hash: [u8; 64]) -> Result<(), ValidationError> {
