@@ -9,8 +9,6 @@ pub struct BlockChain {
 	chain: Vec<Block>,
 	transactions: Vec<Transaction>,
 	transactions_per_block: usize,
-	// priv_key:
-	// pub publ_key:
 }
 
 impl BlockChain {
@@ -24,9 +22,6 @@ impl BlockChain {
 			transactions_per_block,
 		}
 	}
-
-	// genera le chiavi per ogni account del portale, merda
-	// fn generate_keys() -> {}
 
 	pub fn push_transaction(&mut self, transaction: Transaction) {
 		println!("Validating transaction...");
