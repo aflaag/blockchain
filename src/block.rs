@@ -1,6 +1,3 @@
-#![allow(unused_variables)]
-#![allow(dead_code)]
-
 use crate::Transaction;
 
 use std::convert::TryInto;
@@ -57,25 +54,3 @@ impl Default for Block {
 		Block::new(0, [0; 64], Vec::new())
 	}
 }
-
-/*impl fmt::Display for Block {
-	fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        let prev_hash = 5; // change
-        let hash = 3; // change
-
-		let joined_transactions = self.transactions.iter().fold(String::new(), |acc, t| format!("{}{},\n", acc, t));
-
-        write!(f,
-"Block [
-\t\t\tindex: {},
-\t\t\ttransactions:\n{}
-\t\t\tprev_hash: {}
-\t\t\thash: {}
-]",
-        	self.index,
-        	joined_transactions,
-        	prev_hash,
-        	hash,
-        )
-    }
-}*/
