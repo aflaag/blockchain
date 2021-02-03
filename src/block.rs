@@ -41,7 +41,7 @@ impl Block {
 			self.hash = hasher
 				.finalize()[..]
 				.try_into()
-				.expect("Error generating ");
+				.expect("Error generating the SHA-512 hash of the block.");
 
 			self.nonce += 1;
 		}
