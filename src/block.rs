@@ -5,8 +5,8 @@ use sha2::{Sha512, Digest};
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Block {
-index: usize,
-    prev_hash: [u8; 64],
+	index: usize,
+	prev_hash: [u8; 64],
 	transactions: Vec<Transaction>,
 	nonce: u128,
 	// time:
