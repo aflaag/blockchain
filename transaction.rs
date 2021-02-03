@@ -1,6 +1,3 @@
-#![allow(unused_variables)]
-#![allow(dead_code)]
-
 use std::{fmt, error};
 use std::convert::TryInto;
 use sha2::{Sha512, Digest};
@@ -10,9 +7,6 @@ pub struct Transaction {
 	pub sender: String,
 	pub receiver: String,
 	pub amount: u64,
-	// time:
-	// priv_key:
-	// publ_key:
 	pub hash: [u8; 64]
 }
 
@@ -49,8 +43,6 @@ impl Transaction {
 		} else {
 			Ok(())
 		}
-
-		// sign check
 	}
 }
 
