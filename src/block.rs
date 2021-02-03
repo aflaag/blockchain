@@ -9,7 +9,6 @@ pub struct Block {
 	prev_hash: [u8; 64],
 	transactions: Vec<Transaction>,
 	nonce: u128,
-	// time:
 	pub hash: [u8; 64],
 }
 
