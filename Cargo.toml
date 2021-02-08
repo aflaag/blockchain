@@ -8,5 +8,9 @@ edition = "2018"
 
 [dependencies]
 sha2 = "0.9.3"
-rsa = "0.3.0"
-rand = "0.8.3"
+rand = "0.7.0"
+hex-literal = "0.3.1"
+chrono = "0.4"
+
+[dependencies.ed25519-dalek]
+version = "1"
