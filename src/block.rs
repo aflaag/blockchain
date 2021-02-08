@@ -1,122 +1,88 @@
-use crate::{
-	account::Account,
-	transaction::{Transaction, ValidationError},
-	block::Block,
-};
+use crate::transaction::Transaction;
+use std::convert::TryInto;
+use sha2::{Sha512, Digest};
+use chrono::{DateTime, Utc};
 
-/// A struct to handle the blockchain of the currency.
+/// A structure to handle blocks for the blockchain of the currency.
 #[derive(Debug, Clone, PartialEq)]
-pub struct BlockChain {
-	pub index: usize,
-	chain: Vec<Block>,
+pub struct Block {
+	index: usize,
+	prev_hash: [u8; 64],
 	transactions: Vec<Transaction>,
-	transactions_per_block: usize,
+	nonce: u128,
+	time: DateTime<Utc>,
+	hash: [u8; 64],
 }
 
-impl BlockChain {
-	// TODO: HERE
-	/// Generates a new `BlockChain`.
-	/// 
-	/// The treansaction contains:
-	/// - the index of the last block put in the chain
-	/// - the chain of `Block`s
-	/// - the pending transactions, already validated, waiting to be put in a new block
-	/// - the number of transactions per block
-	/// 
-	/// When the blockchain is created, it comes with the genesis block already put in the chain,
-	/// and the genesis is derived from the `Default` implementation of the `Block`.
-	/// 
-	/// # Example
-	/// ```
-	/// let blockchain = BlockChain::new(5); // here you can choose the number of transactions per block
-	/// ```
-	pub fn new(transactions_per_block: usize) -> Self {
-		let genesis_block = Block::default();
-
-		Self {
-			index: 0,
-			chain: vec![genesis_block],
-			transactions: Vec::new(),
-			transactions_per_block,
-		}
-	}
-	
-	// TODO: HERE
-	/// This method creates a transaction with the arguments, and then this transaction is checked:
-	/// if it's a valid transaction, it goes into the `Vec<Transaction>` pending transactions vector,
-	/// and the amount is transferred from the sender's `Account` into the receiver's `Account`;
-	/// if the transaction isn't valid, details are provided.
-	/// 
-	/// When the number of pending transactions is equal to the number of `transactions_per_block`,
-	/// set while creating the blockchain, a new `Block` is generated.
-	/// 
-	/// # Example
-	/// ```
-	/// // these accounts are taken from the `Transaction` example
-	/// let mut alex = Account::new("Alex", "White", "1992#?I_like_Rust92");
-	/// let mut bob = Account::new("Bob", "Reds", "sUpEr_SeCuRe_PaSsWoRd#+!789");
-	/// 
-	/// let blockchain = BlockChain::new(1); // the number of transactions per block is set to 1
-	/// blockchain.push_transaction(&mut alex, &mut bob, 50, "1992#?I_like_Rust92") // the chain is going to have two blocks, the first one being the genesis block
-	/// 
-	/// assert_eq(blockchain.index, 1) // the genesis block has index #0
-	/// ```
-	pub fn push_transaction(&mut self, sender: &mut Account, receiver: &mut Account, amount: f64, sender_password: &str) {
-		let transaction = Transaction::new(sender.clone(), receiver.clone(), amount, sender_password);
-
-		println!("Validating transaction...");
-
-		match transaction.validate(transaction.hash()) {
-			Ok(_) => {
-				self.transactions.push(transaction);
-
-				// the amount is checked in the validation of the transaction
-				unsafe {
-					sender.sub_money_unchecked(amount);
-					receiver.add_money_unchecked(amount);
-				}
-
-				println!("validated!");
-			},
-			Err(e) => match e {
-				ValidationError::Tempered => eprintln!("{} Details: transaction from {} to {}, for an amount of {}, resulted to be tempered.",
-					e,
-					transaction.sender,
-					transaction.receiver,
-					transaction.amount,
-				),
-				ValidationError::WrongPassword => eprintln!("{} Details: the sender's password is not correct.", e),
-				ValidationError::InvalidSignature => eprintln!("{} Details: transaction from {} to {}, for an amount of {}, wasn't validated because of invalid signature.",
-					e,
-					transaction.sender,
-					transaction.receiver,
-					transaction.amount,
-				),
-				ValidationError::InvalidAmount => eprintln!("{} Details: transaction from {} to {}, for an amount of {}, wasn't validated because of an invalid amount.",
-					e,
-					transaction.sender,
-					transaction.receiver,
-					transaction.amount,
-				),
-			},
+impl Block {
+	/// Generates a new `Block`.
+	/// Every block of the chain contains:
+	/// - the index (the #0 block is the genesis block)
+	/// - the SHA-512 hash of the previous block
+	/// - the transactions of the block
+	/// (the number of transactions per block is set while generating the blockchain)
+	/// - the nonce, which is used for the proof of work
+	/// - the `DateTime<Utc>` time when the block was generated
+	/// - the hash of the block generated
+	pub fn new(index: usize, prev_hash: [u8; 64], transactions: Vec<Transaction>) -> Self {
+		let mut block = Self {
+			index,
+			prev_hash,
+			transactions,
+			nonce: 0,
+			time: Utc::now(),
+			hash: [0; 64],
 		};
 
-		if self.transactions.len() == self.transactions_per_block {
-			self.index += 1;
+		block.calculate_hash();
 
-			println!("Validating block...");
+		block
+	}
 
-			let new_block = Block::new(
+	/// This method returns the balance of the account, since the `balance` field isn't `pub`.
+	pub fn hash(&self) -> [u8; 64] {
+		self.hash
+	}
+
+	/// This method is called when a new block is generated,
+	/// and it is used to calculate the SHA-512 hash of the new block.
+	/// 
+	/// The hash is calculated by using:
+	/// - the index of the block
+	/// - the previous hash
+	/// - the `Transaction`s hashes
+	/// - the `DateTime<Utc>` time when the block was generated
+	/// - the nonce used for the proof of work
+	/// 
+	/// The proof of work is checked in the condition of the while loop.
+	fn calculate_hash(&mut self) {
+		while self.hash[0..2] != [69, 69] {
+			let mut hasher = Sha512::new();
+
+			let transactions_hashes = self.transactions.iter().fold(String::new(), |acc, t| format!("{:?}{:?}", acc, t.hash()));
+			
+			let digest = format!("{}{:?}{}{:?}{}",
 				self.index,
-				self.chain.last().unwrap().hash(),
-				self.transactions.clone()
+				self.prev_hash,
+				transactions_hashes,
+				self.time,
+				self.nonce
 			);
+	
+			hasher.update(digest.as_bytes());
+			
+			self.hash = hasher
+				.finalize()[..]
+				.try_into()
+				.expect("Error generating the SHA-512 hash of the block.");
 
-			self.chain.push(new_block);
-
-			self.transactions.clear();
-
-			println!("validated!");
+			self.nonce += 1;
 		}
+	}
+}
+
+impl Default for Block {
+	fn default() -> Self {
+		Block::new(0, [0; 64], Vec::new())
 	}
 }
