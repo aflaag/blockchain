@@ -6,13 +6,21 @@ use std::{
 
 /// A struct to handle positive `f64` numbers.
 #[derive(Debug, Copy, Clone, PartialEq)]
-pub struct PositiveF64(f64);
+pub struct PositiveF64(pub f64);
 
+// TODO: fixa la solita
 impl PositiveF64 {
     /// Generates a new `PositiveF64`.
     /// 
     /// The function returns a `Result<PositiveF64, InvalidNumber>`, because
     /// if the number is negative, an `InvalidNumber::NegativeValue` error is returned
+    /// 
+    /// # Example
+    /// ```
+    /// let positive_f64 = PositiveF64::new(3.0).unwrap();
+    /// 
+    /// assert_eq!(positive_f64.0, 3.0);
+    /// ```
     pub fn new(number: f64) -> Result<Self, InvalidNumber> {
         if number >= 0.0 {
             Ok(PositiveF64(number))
@@ -22,11 +30,14 @@ impl PositiveF64 {
     }
     
     /// Allows to create a `PositiveF64` without checking if the number is positive.
+    /// 
+    /// # Example
+    /// ```
+    /// ```
     #[allow(dead_code)]
     pub unsafe fn new_unchecked(number: f64) -> Self {
         PositiveF64(number)
     }
-
 }
 
 impl fmt::Display for PositiveF64 {
@@ -39,16 +50,17 @@ impl ops::Add for PositiveF64 {
     type Output = PositiveF64;
 
     fn add(self, other: Self) -> Self {
-        PositiveF64(self.0 + other.0) // a + b, if a and b are both positive, is positive
+        PositiveF64(self.0 + other.0)
     }
 }
 
-// TODO: cambia
 impl ops::Sub for PositiveF64 {
     type Output = PositiveF64;
 
     fn sub(self, other: Self) -> Self {
-        PositiveF64::new(self.0 - other.0).unwrap() // a - b, if a and b are both positive, is positive if a > b, or 0 if a = b
+        let _ = PositiveF64::new(self.0 - other.0).unwrap(); // if the difference is >= 0.0
+
+        PositiveF64::new(self.0 - other.0).unwrap()
     }
 }
 
@@ -58,14 +70,11 @@ impl ops::AddAssign for PositiveF64 {
     }
 }
 
-// prob shouldn't be there
 impl ops::SubAssign for PositiveF64 {
     fn sub_assign(&mut self, other: Self) {
-        self.0 -= if let Ok(o) = PositiveF64::new(self.0 - other.0) {
-            o.0
-        } else {
-            0.0
-        }
+        let _ = PositiveF64::new(self.0 - other.0).unwrap(); // if the difference is >= 0.0
+
+        self.0 -= other.0;
     }
 }
 
