@@ -8,11 +8,11 @@ use crate::positive_f64::PositiveF64;
 /// A structure to handle accounts for the currency.
 #[derive(Debug, Clone, PartialEq)]
 pub struct Account {
-	pub first_name: String,
-	pub last_name: String,
-	pub balance: PositiveF64,
-	pub keypair: [u8; 64],
-	pub hash_password: [u8; 64],
+	first_name: String,
+	last_name: String,
+	balance: PositiveF64,
+	keypair: [u8; 64],
+	hash_password: [u8; 64],
 }
 
 impl Account {
@@ -25,7 +25,7 @@ impl Account {
 	/// # Example
 	///
 	/// ```
-	/// // TODO: COME CAZZO SI FA
+	/// // TODO: HERE
 	/// let ferris = Account::new("Ferris", "Rusty", "I_Love_Ferris_123!#"); // make sure your password is safe enough!
 	/// 
 	/// //assert_eq!(1, 2);
@@ -52,7 +52,12 @@ impl Account {
 		}
 	}
 
+	// TODO: HERE
 	/// A method to add money to your balance; the amount can't be `0.0`, and can't be negative.
+	/// 
+	/// # Example
+	/// ```
+	/// ```
 	pub fn add_money(&mut self, amount: f64) {
 		if amount == 0.0 {
 			eprintln!("Can't add a zero-value amount to the balance.")
@@ -64,15 +69,21 @@ impl Account {
 		}
 	}
 
+
+	// TODO: HERE
 	/// A method to subtract money to your balance; the amount to subtract can't be `0.0`, can't be negative,
 	/// and can't be more than the amount in your balance.
+	/// 
+	/// # Example
+	/// ```
+	/// ```
 	pub fn sub_money(&mut self, amount: f64) {
 		if amount == 0.0 {
 			eprintln!("Can't subtract a zero-value amount to the balance.")
 		} else {
 			match PositiveF64::new(amount) {
 				Ok(a) => {
-					if let Ok(_) = PositiveF64::new(self.balance.0 - a.0) { // if the difference is >= 0.0
+					if PositiveF64::new(self.balance.value() - a.value()).is_ok() { // if the difference is >= 0.0
 						self.balance -= a
 					} else {
 						eprintln!("Can't subtract an amount that is more than the amount in your balance.")
@@ -83,10 +94,84 @@ impl Account {
 		}
 	}
 
+	// TODO: HERE
+	/// This method returns the balance of the account, since the `balance` field isn't `pub`.
+	pub fn balance(&self) -> f64 {
+		self.balance.value()
+	}
+
+	// TODO: HERE
+	/// This method returns the keypair of the account, since the `keypair` field isn't `pub`.
+	pub fn keypair(&self) -> [u8; 64] {
+		self.keypair
+	}
+
+	// TODO: HERE
+	/// This method returns the hash of the password of the account, since the `hash_password` field isn't `pub`.
+	pub fn hash_password(&self) -> [u8; 64] {
+		self.hash_password
+	}
+
+	// TODO: HERE
 	/// A method to add money to your balance, without checking if the amount is non-zero and positive.
-	#[allow(dead_code)]
+	/// 
+    /// # Safety
+    /// Adds money to the balance without checking if the amount is valid.
+    /// 
+    /// # Examples
+    /// 
+    /// ```
+    /// unsafe {
+	/// 
+    /// }
+    /// ```
+    /// 
+    /// # Panics
+    /// 
+    /// The invalid amount could lead to uncertain behaviour with calculations.
+    /// 
+    /// ```should_panic
+    /// let mut john = Account::new("John", "Keats", "my_password2021!");
+    /// 
+	/// unsafe {
+	/// 	john.add_money_unchecked(-4.0);
+	/// 
+	/// 	// The above expression could make the program panic!
+    /// }
+    /// ```
 	pub unsafe fn add_money_unchecked(&mut self, amount: f64) {
 		self.balance += PositiveF64::new_unchecked(amount)
+	}
+
+	// TODO: HERE
+	/// A method to subtract money to your balance, without checking if the amount is non-zero and positive.
+	/// 
+    /// # Safety
+    /// Subtracts money to the balance without checking if the amount is valid.
+    /// 
+    /// # Examples
+    /// 
+    /// ```
+    /// unsafe {
+	/// 
+    /// }
+    /// ```
+    /// 
+    /// # Panics
+    /// 
+    /// The invalid amount could lead to uncertain behaviour with calculations.
+    /// 
+    /// ```should_panic
+    /// let mut john = Account::new("John", "Keats", "my_password2021!");
+	/// 
+	/// unsafe {
+	/// 	john.sub_money_unchecked(-5.0);
+	/// 
+	/// 	// The above expression could make the program panic!
+    /// }
+    /// ```
+	pub unsafe fn sub_money_unchecked(&mut self, amount: f64) {
+		self.balance -= PositiveF64::new_unchecked(amount)
 	}
 }
 
