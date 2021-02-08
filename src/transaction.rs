@@ -18,11 +18,11 @@ pub struct Transaction {
 	pub sender: Account,
 	pub receiver: Account,
 	pub amount: f64,
-	pub time: DateTime<Utc>,
+	time: DateTime<Utc>,
 	hash_sender_password: [u8; 64],
 	message: String,
 	signature: [u8; 64],
-	pub hash: [u8; 64],
+	hash: [u8; 64],
 }
 
 impl Transaction {
@@ -67,6 +67,11 @@ impl Transaction {
 		transaction
 	}
 
+	/// This method returns the hash of the transaction, since the `hash` field isn't `pub`.
+	pub fn hash(&self) -> [u8; 64] {
+		self.hash
+	}
+
 	/// This method is called when a new transaction is generated,
 	/// and it is used to perform the digital signature of the new transaction.
 	/// 
@@ -79,7 +84,7 @@ impl Transaction {
 	/// - the amount of the transaction
 	/// - the `DateTime<Utc>` time when the block was generated
 	fn sign(&mut self) {
-		let keypair = Keypair::from_bytes(&self.sender.keypair).expect("Error generating the Keypair while signing the transaction.");
+		let keypair = Keypair::from_bytes(&self.sender.keypair()).expect("Error generating the Keypair while signing the transaction.");
 		
 		self.message = format!("{}{}{}{:?}", self.sender, self.receiver, self.amount, self.time);
 
@@ -113,20 +118,20 @@ impl Transaction {
 	/// a `ValidationError::WrongPassword` error is returned.
 	/// - If the signature verification doesn't succeed,
 	/// a `ValidationError::InvalidSign` error is returned.
-	/// - If the amount is zero or negative,
+	/// - If the amount is zero or negative, or if the amount of the transaction is more than the sender's balance,
 	/// a `ValidationError::InvalidAmount` error is returned. 
 	pub fn validate(&self, hash: [u8; 64]) -> Result<(), ValidationError> {
 		let signature = Signature::try_from(self.signature).expect("Error generating the Signature while validating the transaction.");
 
-		let keypair = Keypair::from_bytes(&self.sender.keypair).expect("Error generating the Keypair while validating the transaction.");
+		let keypair = Keypair::from_bytes(&self.sender.keypair()).expect("Error generating the Keypair while validating the transaction.");
 
 		if hash != self.hash {
 			Err(ValidationError::Tempered)
-		} else if self.hash_sender_password != self.sender.hash_password {
+		} else if self.hash_sender_password != self.sender.hash_password() {
 			Err(ValidationError::WrongPassword)
 		} else if keypair.verify(self.message.as_bytes(), &signature).is_err() {
 			Err(ValidationError::InvalidSignature)
-		} else if PositiveF64::new(self.amount).is_err() || self.amount == 0.0 || self.sender.balance.0 < self.amount {
+		} else if PositiveF64::new(self.amount).is_err() || self.amount == 0.0 || self.amount > self.sender.balance() {
 			Err(ValidationError::InvalidAmount)
 		} else {
 			Ok(())
