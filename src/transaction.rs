@@ -149,7 +149,7 @@ impl fmt::Display for ValidationError {
         	Self::Tempered =>  write!(f, "Tempered transaction."),
         	Self::WrongPassword => write!(f, "Wrong password."),
         	Self::InvalidSignature => write!(f, "Invalid signature."),
-			Self::InvalidAmount => write!(f, "Invalid amount.")
+		Self::InvalidAmount => write!(f, "Invalid amount.")
         }
     }
 }
