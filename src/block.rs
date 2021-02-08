@@ -1,7 +1,7 @@
 use crate::transaction::Transaction;
 use std::convert::TryInto;
 use sha2::{Sha512, Digest};
-//use hex_literal::hex;
+use chrono::{DateTime, Utc};
 
 /// A structure to handle blocks for the blockchain of the currency.
 #[derive(Debug, Clone, PartialEq)]
@@ -10,7 +10,7 @@ pub struct Block {
 	prev_hash: [u8; 64],
 	transactions: Vec<Transaction>,
 	nonce: u128,
-	// time:
+	pub time: DateTime<Utc>,
 	pub hash: [u8; 64],
 }
 
@@ -22,6 +22,7 @@ impl Block {
 	/// - the transactions of the block
 	/// (the number of transactions per block is set while generating the blockchain)
 	/// - the nonce, which is used for the proof of work
+	/// - the `DateTime<Utc>` time when the block was generated
 	/// - the hash of the block generated
 	pub fn new(index: usize, prev_hash: [u8; 64], transactions: Vec<Transaction>) -> Self {
 		let mut block = Self {
@@ -29,6 +30,7 @@ impl Block {
 			prev_hash,
 			transactions,
 			nonce: 0,
+			time: Utc::now(),
 			hash: [0; 64],
 		};
 
@@ -44,6 +46,7 @@ impl Block {
 	/// - the index of the block
 	/// - the previous hash
 	/// - the `Transaction`s hashes
+	/// - the `DateTime<Utc>` time when the block was generated
 	/// - the nonce used for the proof of work
 	/// 
 	/// The proof of work is checked in the condition of the while loop.
@@ -52,8 +55,14 @@ impl Block {
 			let mut hasher = Sha512::new();
 
 			let transactions_hashes = self.transactions.iter().fold(String::new(), |acc, t| format!("{:?}{:?}", acc, t.hash));
-	
-			let digest = format!("{}{:?}{}{}", self.index, self.prev_hash, transactions_hashes, self.nonce);
+			
+			let digest = format!("{}{:?}{}{:?}{}",
+				self.index,
+				self.prev_hash,
+				transactions_hashes,
+				self.time,
+				self.nonce
+			);
 	
 			hasher.update(digest.as_bytes());
 			
