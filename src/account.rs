@@ -115,30 +115,30 @@ impl Account {
 	// TODO: HERE
 	/// A method to add money to your balance, without checking if the amount is non-zero and positive.
 	/// 
-    /// # Safety
-    /// Adds money to the balance without checking if the amount is valid.
-    /// 
-    /// # Examples
-    /// 
-    /// ```
-    /// unsafe {
+    	/// # Safety
+  	/// Adds money to the balance without checking if the amount is valid.
+   	/// 
+    	/// # Examples
+    	/// 
+    	/// ```
+    	/// unsafe {
 	/// 
-    /// }
-    /// ```
-    /// 
-    /// # Panics
-    /// 
-    /// The invalid amount could lead to uncertain behaviour with calculations.
-    /// 
-    /// ```should_panic
-    /// let mut john = Account::new("John", "Keats", "my_password2021!");
-    /// 
+    	/// }
+    	/// ```
+    	/// 
+    	/// # Panics
+    	/// 
+    	/// The invalid amount could lead to uncertain behaviour with calculations.
+    	/// 
+    	/// ```should_panic
+    	/// let mut john = Account::new("John", "Keats", "my_password2021!");
+    	/// 
 	/// unsafe {
 	/// 	john.add_money_unchecked(-4.0);
 	/// 
 	/// 	// The above expression could make the program panic!
-    /// }
-    /// ```
+    	/// }
+    	/// ```
 	pub unsafe fn add_money_unchecked(&mut self, amount: f64) {
 		self.balance += PositiveF64::new_unchecked(amount)
 	}
@@ -146,30 +146,30 @@ impl Account {
 	// TODO: HERE
 	/// A method to subtract money to your balance, without checking if the amount is non-zero and positive.
 	/// 
-    /// # Safety
-    /// Subtracts money to the balance without checking if the amount is valid.
-    /// 
-    /// # Examples
-    /// 
-    /// ```
-    /// unsafe {
+    	/// # Safety
+    	/// Subtracts money to the balance without checking if the amount is valid.
+    	/// 
+    	/// # Examples
+    	/// 
+    	/// ```
+    	/// unsafe {
 	/// 
-    /// }
-    /// ```
-    /// 
-    /// # Panics
-    /// 
-    /// The invalid amount could lead to uncertain behaviour with calculations.
-    /// 
-    /// ```should_panic
-    /// let mut john = Account::new("John", "Keats", "my_password2021!");
+    	/// }
+    	/// ```
+    	/// 
+    	/// # Panics
+    	/// 
+    	/// The invalid amount could lead to uncertain behaviour with calculations.
+    	/// 
+    	/// ```should_panic
+    	/// let mut john = Account::new("John", "Keats", "my_password2021!");
 	/// 
 	/// unsafe {
 	/// 	john.sub_money_unchecked(-5.0);
 	/// 
 	/// 	// The above expression could make the program panic!
-    /// }
-    /// ```
+    	/// }
+    	/// ```
 	pub unsafe fn sub_money_unchecked(&mut self, amount: f64) {
 		self.balance -= PositiveF64::new_unchecked(amount)
 	}
