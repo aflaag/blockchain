@@ -77,6 +77,7 @@ impl Account {
 	/// # Example
 	/// ```
 	/// ```
+	#[allow(dead_code)]
 	pub fn sub_money(&mut self, amount: f64) {
 		if amount == 0.0 {
 			eprintln!("Can't subtract a zero-value amount to the balance.")
