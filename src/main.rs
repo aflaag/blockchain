@@ -9,17 +9,12 @@ use crate::{
 	account::Account,
 };
 
-// TODO:
-// capire come fare i test negli esempi
-// far funzionare i test
-
 fn main() {
 	let mut a0 = Account::new("a", "a", "a");
 	let mut a1 = Account::new("b", "b", "b");
 	let mut a2 = Account::new("c", "c", "c");
 	let mut a3 = Account::new("d", "d", "d");
 	let mut a4 = Account::new("e", "e", "e");
-	//let mut a5 = Account::new("f", "f", "f");
 	
 	a0.add_money(100.0);
 	a2.add_money(100.0);
