@@ -21,13 +21,12 @@ fn main() {
 	let mut a4 = Account::new("e", "e", "e");
 	//let mut a5 = Account::new("f", "f", "f");
 	
-	//a0.add_money(100.0);
-	a0.sub_money(3.0);
+	a0.add_money(100.0);
 	a2.add_money(100.0);
 	a4.add_money(100.0);
 
 	let mut blockchain = BlockChain::new(2);
-	blockchain.push_transaction(&mut a0, &mut a1, 0.0, "a");
+	blockchain.push_transaction(&mut a0, &mut a1, 2.0, "a");
 	blockchain.push_transaction(&mut a2, &mut a3, 1.0, "c");
 
 	println!("{} {} {} {} {}", a0, a1, a2, a3, a4);
