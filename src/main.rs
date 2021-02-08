@@ -9,10 +9,6 @@ use crate::{
     account::Account,
 };
 
-// TODO:
-// capire come fare i test negli esempi
-// far funzionare i test
-
 fn main() {
     let mut a0 = Account::new("a", "a", "a");
     let mut a1 = Account::new("b", "b", "b");
