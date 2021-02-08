@@ -1,4 +1,5 @@
 use crate::{
+	account::Account,
 	transaction::{Transaction, ValidationError},
 	block::Block,
 };
@@ -13,6 +14,7 @@ pub struct BlockChain {
 }
 
 impl BlockChain {
+	// TODO: fix same thing
 	/// Generates a new `BlockChain`.
 	/// 
 	/// The treansaction contains:
@@ -40,9 +42,10 @@ impl BlockChain {
 	}
 	
 	// TODO: ancora non so come si fa sempre la solita cosa
-	/// When this method is called, the transaction is checked, and if it's a valid transaction,
-	/// it goes into the `Vec<Transaction>` pending transactions vector.
-	/// If the transaction isn't valid, details are provided.
+	/// This method creates a transaction with the arguments, and then this transaction is checked:
+	/// if it's a valid transaction, it goes into the `Vec<Transaction>` pending transactions vector,
+	/// and the amount is transferred from the sender's `Account` into the receiver's `Account`;
+	/// if the transaction isn't valid, details are provided.
 	/// 
 	/// When the number of pending transactions is equal to the number of `transactions_per_block`,
 	/// set while creating the blockchain, a new `Block` is generated.
@@ -50,22 +53,26 @@ impl BlockChain {
 	/// # Example
 	/// ```
 	/// // these accounts are taken from the `Transaction` example
-	/// let alex = Account::new("Alex", "White", "1992#?I_like_Rust92");
-	/// let bob = Account::new("Bob", "Reds", "sUpEr_SeCuRe_PaSsWoRd#+!789");
+	/// let mut alex = Account::new("Alex", "White", "1992#?I_like_Rust92");
+	/// let mut bob = Account::new("Bob", "Reds", "sUpEr_SeCuRe_PaSsWoRd#+!789");
 	/// 
-	/// let transaction = Transaction::new(alex, bob, 50, "1992#?I_like_Rust92");
-	/// 
-	/// let blockchain = BlockChain::new(1);
-	/// blockchain.push_transaction(transaction) // the blockchain is going to have two blocks, the genesis block and the block with this single transaction, since the number of transactions per block is set to 1
+	/// let blockchain = BlockChain::new(1); // the number of transactions per block is set to 1
+	/// blockchain.push_transaction(&mut alex, &mut bob, 50, "1992#?I_like_Rust92") // the chain is going to have two blocks, the first one being the genesis block
 	/// 
 	/// assert_eq(blockchain.index, 1) // the genesis block has index #0
 	/// ```
-	pub fn push_transaction(&mut self, transaction: Transaction) {
+	pub fn push_transaction(&mut self, sender: &mut Account, receiver: &mut Account, amount: f64, sender_password: &str) {
+		let transaction = Transaction::new(sender.clone(), receiver.clone(), amount, sender_password);
+
 		println!("Validating transaction...");
 
 		match transaction.validate(transaction.hash) {
 			Ok(_) => {
 				self.transactions.push(transaction);
+
+				sender.sub_money(amount);
+				receiver.add_money(amount);
+
 				println!("validated!");
 			},
 			Err(e) => match e {
@@ -76,7 +83,7 @@ impl BlockChain {
 					transaction.amount,
 				),
 				ValidationError::WrongPassword => eprintln!("{} Details: the sender's password is not correct.", e),
-				ValidationError::InvalidSign => eprintln!("{} Details: transaction from {} to {}, for an amount of {}, wasn't validated because of invalid signature.",
+				ValidationError::InvalidSignature => eprintln!("{} Details: transaction from {} to {}, for an amount of {}, wasn't validated because of invalid signature.",
 					e,
 					transaction.sender,
 					transaction.receiver,
@@ -95,11 +102,6 @@ impl BlockChain {
 			self.index += 1;
 
 			println!("Validating block...");
-		
-			self.transactions.iter_mut().for_each(|t| {
-				t.sender.sub_money(t.amount);
-				t.receiver.add_money(t.amount);
-			});
 
 			let new_block = Block::new(
 				self.index,
