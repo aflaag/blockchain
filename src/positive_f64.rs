@@ -44,7 +44,7 @@ impl PositiveF64 {
     
     // TODO: HERE
     /// Allows to create a `PositiveF64` without checking if the number is positive.
-	/// 
+    /// 
     /// # Safety
     /// 
     /// 
@@ -52,7 +52,7 @@ impl PositiveF64 {
     /// 
     /// ```
     /// unsafe {
-	/// 
+    /// 
     /// }
     /// ```
     /// 
@@ -61,10 +61,10 @@ impl PositiveF64 {
     /// The invalid value could lead to uncertain behaviour.
     /// 
     /// ```should_panic
-	/// unsafe {
-    /// 	let invalid_value = PositiveF64::new_unchecked(-9.0);
+    /// unsafe {
+    ///     let invalid_value = PositiveF64::new_unchecked(-9.0);
     /// 
-	/// 	// The above expression could make the program panic!
+    ///     // The above expression could make the program panic!
     /// }
     /// ```
     pub unsafe fn new_unchecked(number: f64) -> Self {
@@ -119,7 +119,7 @@ pub enum InvalidNumber {
 impl fmt::Display for InvalidNumber {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match *self {
-        	Self::NegativeValue => write!(f, "The number can't be negative."),
+            Self::NegativeValue => write!(f, "The number can't be negative."),
         }
     }
 }
