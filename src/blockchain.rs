@@ -14,7 +14,7 @@ pub struct BlockChain {
 }
 
 impl BlockChain {
-	// TODO: fix same thing
+	// TODO: HERE
 	/// Generates a new `BlockChain`.
 	/// 
 	/// The treansaction contains:
@@ -41,7 +41,7 @@ impl BlockChain {
 		}
 	}
 	
-	// TODO: ancora non so come si fa sempre la solita cosa
+	// TODO: HERE
 	/// This method creates a transaction with the arguments, and then this transaction is checked:
 	/// if it's a valid transaction, it goes into the `Vec<Transaction>` pending transactions vector,
 	/// and the amount is transferred from the sender's `Account` into the receiver's `Account`;
@@ -66,12 +66,15 @@ impl BlockChain {
 
 		println!("Validating transaction...");
 
-		match transaction.validate(transaction.hash) {
+		match transaction.validate(transaction.hash()) {
 			Ok(_) => {
 				self.transactions.push(transaction);
 
-				sender.sub_money(amount);
-				receiver.add_money(amount);
+				// the amount is checked in the validation of the transaction
+				unsafe {
+					sender.sub_money_unchecked(amount);
+					receiver.add_money_unchecked(amount);
+				}
 
 				println!("validated!");
 			},
@@ -105,7 +108,7 @@ impl BlockChain {
 
 			let new_block = Block::new(
 				self.index,
-				self.chain.last().unwrap().hash,
+				self.chain.last().unwrap().hash(),
 				self.transactions.clone()
 			);
 
