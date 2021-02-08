@@ -20,7 +20,7 @@ impl Account {
 	/// Every account has a first name, a last name, a balance and a password, which is used to validate the transactions;
 	/// the password is saved using the SHA-512 hashing algorithm.
 	/// Also, every account has a `Keypair` which is used to validate the signature of the transaction,
-	/// using `ed25519_dalek` crate.
+	/// using the `ed25519_dalek` crate.
 	/// 
 	/// # Example
 	///
@@ -64,12 +64,20 @@ impl Account {
 		}
 	}
 
+	/// A method to subtract money to your balance; the amount to subtract can't be `0.0`, can't be negative,
+	/// and can't be more than the amount in your balance.
 	pub fn sub_money(&mut self, amount: f64) {
 		if amount == 0.0 {
 			eprintln!("Can't subtract a zero-value amount to the balance.")
 		} else {
 			match PositiveF64::new(amount) {
-				Ok(a) => self.balance -= a,
+				Ok(a) => {
+					if let Ok(_) = PositiveF64::new(self.balance.0 - a.0) { // if the difference is >= 0.0
+						self.balance -= a
+					} else {
+						eprintln!("Can't subtract an amount that is more than the amount in your balance.")
+					}
+				},
 				Err(e) => eprintln!("{} Details: can't subtract a negative amount to the balance.", e)
 			}
 		}
@@ -84,6 +92,6 @@ impl Account {
 
 impl fmt::Display for Account {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "[{} {}, {}]", self.first_name, self.last_name, self.balance)
+        write!(f, "({} {}: {})", self.first_name, self.last_name, self.balance)
     }
 }
