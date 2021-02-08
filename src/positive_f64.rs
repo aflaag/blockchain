@@ -6,10 +6,10 @@ use std::{
 
 /// A struct to handle positive `f64` numbers.
 #[derive(Debug, Copy, Clone, PartialEq)]
-pub struct PositiveF64(pub f64);
+pub struct PositiveF64(f64);
 
-// TODO: fixa la solita
 impl PositiveF64 {
+    // TODO: HERE
     /// Generates a new `PositiveF64`.
     /// 
     /// The function returns a `Result<PositiveF64, InvalidNumber>`, because
@@ -28,13 +28,45 @@ impl PositiveF64 {
             Err(InvalidNumber::NegativeValue)
         }
     }
-    
-    /// Allows to create a `PositiveF64` without checking if the number is positive.
+
+    // TODO: HERE
+    /// This method returns the value of the number, since the value in the struct isn't `pub`.
     /// 
     /// # Example
     /// ```
+    /// let number = PositiveF64::new(5.0).unwrap();
+    /// 
+    /// assert_eq!(number, 5.0);
     /// ```
-    #[allow(dead_code)]
+    pub fn value(&self) -> f64 {
+        self.0
+    }
+    
+    // TODO: HERE
+    /// Allows to create a `PositiveF64` without checking if the number is positive.
+	/// 
+    /// # Safety
+    /// 
+    /// 
+    /// # Examples
+    /// 
+    /// ```
+    /// unsafe {
+	/// 
+    /// }
+    /// ```
+    /// 
+    /// # Panics
+    /// 
+    /// The invalid value could lead to uncertain behaviour.
+    /// 
+    /// ```should_panic
+	/// unsafe {
+    /// 	let invalid_value = PositiveF64::new_unchecked(-9.0);
+    /// 
+	/// 	// The above expression could make the program panic!
+    /// }
+    /// ```
     pub unsafe fn new_unchecked(number: f64) -> Self {
         PositiveF64(number)
     }
