@@ -1,10 +1,4 @@
-mod account;
-mod positive_f64;
-mod transaction;
-mod block;
-mod blockchain;
-
-use crate::{
+use blockchain::{
     blockchain::BlockChain,
     account::Account,
 };
@@ -15,7 +9,6 @@ fn main() {
     let mut a2 = Account::new("c", "c", "c");
     let mut a3 = Account::new("d", "d", "d");
     let mut a4 = Account::new("e", "e", "e");
-    //let mut a5 = Account::new("f", "f", "f");
     
     a0.add_money(100.0);
     a2.add_money(100.0);
