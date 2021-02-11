@@ -9,17 +9,17 @@ use std::{
 pub struct PositiveF64(f64);
 
 impl PositiveF64 {
-    // TODO: HERE
     /// Generates a new `PositiveF64`.
     /// 
     /// The function returns a `Result<PositiveF64, InvalidNumber>`, because
-    /// if the number is negative, an `InvalidNumber::NegativeValue` error is returned
+    /// if the number is negative, an `InvalidNumber::NegativeValue` error is returned.
     /// 
     /// # Example
     /// ```
+    /// # use blockchain::positive_f64::PositiveF64;
     /// let positive_f64 = PositiveF64::new(3.0).unwrap();
     /// 
-    /// assert_eq!(positive_f64.0, 3.0);
+    /// assert_eq!(positive_f64.value(), 3.0); // this method returns the value
     /// ```
     pub fn new(number: f64) -> Result<Self, InvalidNumber> {
         if number >= 0.0 {
@@ -29,38 +29,39 @@ impl PositiveF64 {
         }
     }
 
-    // TODO: HERE
     /// This method returns the value of the number, since the value in the struct isn't `pub`.
     /// 
     /// # Example
     /// ```
+    /// # use blockchain::positive_f64::PositiveF64;
     /// let number = PositiveF64::new(5.0).unwrap();
     /// 
-    /// assert_eq!(number, 5.0);
+    /// assert_eq!(number.value(), 5.0);
     /// ```
     pub fn value(&self) -> f64 {
         self.0
     }
     
-    // TODO: HERE
-    /// Allows to create a `PositiveF64` without checking if the number is positive.
+    /// Creates a new `PositiveF64` without checking the input.
     /// 
     /// # Safety
-    /// 
+    /// Allows to create a `PositiveF64` without checking if the number is positive or `0.0`.
     /// 
     /// # Examples
-    /// 
     /// ```
+    /// # use blockchain::positive_f64::PositiveF64;
     /// unsafe {
+    ///     let number = PositiveF64::new_unchecked(4.0);
     /// 
+    ///     assert_eq!(number.value(), 4.0);
     /// }
     /// ```
     /// 
     /// # Panics
-    /// 
     /// The invalid value could lead to uncertain behaviour.
     /// 
-    /// ```should_panic
+    /// ```
+    /// # use blockchain::positive_f64::PositiveF64;
     /// unsafe {
     ///     let invalid_value = PositiveF64::new_unchecked(-9.0);
     /// 
