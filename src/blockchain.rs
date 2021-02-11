@@ -14,7 +14,6 @@ pub struct BlockChain {
 }
 
 impl BlockChain {
-    // TODO: HERE
     /// Generates a new `BlockChain`.
     /// 
     /// The treansaction contains:
@@ -28,7 +27,10 @@ impl BlockChain {
     /// 
     /// # Example
     /// ```
+    /// # use blockchain::blockchain::BlockChain;
     /// let blockchain = BlockChain::new(5); // here you can choose the number of transactions per block
+    /// 
+    /// assert_eq!(blockchain.chain().len(), 1); // the blockchain starts with the genesis block
     /// ```
     pub fn new(transactions_per_block: usize) -> Self {
         let genesis_block = Block::default();
@@ -40,8 +42,7 @@ impl BlockChain {
             transactions_per_block,
         }
     }
-    
-    // TODO: HERE
+
     /// This method creates a transaction with the arguments, and then this transaction is checked:
     /// if it's a valid transaction, it goes into the `Vec<Transaction>` pending transactions vector,
     /// and the amount is transferred from the sender's `Account` into the receiver's `Account`;
@@ -52,14 +53,16 @@ impl BlockChain {
     /// 
     /// # Example
     /// ```
-    /// // these accounts are taken from the `Transaction` example
+    /// # use blockchain::blockchain::BlockChain;
+    /// # use blockchain::account::Account;
     /// let mut alex = Account::new("Alex", "White", "1992#?I_like_Rust92");
     /// let mut bob = Account::new("Bob", "Reds", "sUpEr_SeCuRe_PaSsWoRd#+!789");
+    /// alex.add_money(100.0); // alex must have enough money to perform the transaction!
     /// 
-    /// let blockchain = BlockChain::new(1); // the number of transactions per block is set to 1
-    /// blockchain.push_transaction(&mut alex, &mut bob, 50, "1992#?I_like_Rust92") // the chain is going to have two blocks, the first one being the genesis block
+    /// let mut blockchain = BlockChain::new(1); // the number of transactions per block is set to 1
+    /// blockchain.push_transaction(&mut alex, &mut bob, 50.0, "1992#?I_like_Rust92"); // the chain is going to have two blocks, the first one being the genesis block
     /// 
-    /// assert_eq(blockchain.index, 1) // the genesis block has index #0
+    /// assert_eq!(blockchain.index, 1); // the genesis block has index #0
     /// ```
     pub fn push_transaction(&mut self, sender: &mut Account, receiver: &mut Account, amount: f64, sender_password: &str) {
         let transaction = Transaction::new(sender.clone(), receiver.clone(), amount, sender_password);
@@ -118,5 +121,18 @@ impl BlockChain {
 
             println!("validated!");
         }
+    }
+    
+    /// This method returns the `chain` of the blockchain, since this field isn't `pub`.
+    /// 
+    /// # Example
+    /// ```
+    /// # use blockchain::blockchain::BlockChain;
+    /// let blockchain = BlockChain::new(8);
+    /// 
+    /// assert_eq!(blockchain.chain().len(), 1); // the blockchain starts with the genesis block
+    /// ```
+    pub fn chain(&self) -> Vec<Block> {
+        self.chain.clone()
     }
 }
