@@ -1,5 +1,5 @@
 [package]
-name = "rs-crypto"
+name = "blockchain"
 version = "0.1.0"
 authors = ["ph04"]
 edition = "2018"
