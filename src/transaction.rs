@@ -13,11 +13,24 @@ use ed25519_dalek::{
 };
 
 /// A structure to handle the transactions of the blockchain.
+/// 
+/// Every transaction contains:
+/// - the sender's `Account`
+/// - the receiver's `Account`
+/// - the amount of the transaction
+/// - the `DateTime<Utc>` time when the block was generated
+/// - the SHA-512 hash of the sender's password
+/// - the message to be signed
+/// - the digital signature of the message
+/// - the hash of the transaction
+/// 
+/// Note: this structure **does not** handle the actual transfer of money,
+/// `.push_transaction()` from `blockchain::BlockChain` handles that.
 #[derive(Debug, Clone, PartialEq)]
 pub struct Transaction {
     pub sender: Account,
     pub receiver: Account,
-    pub amount: f64,
+    amount: f64,
     time: DateTime<Utc>,
     hash_sender_password: [u8; 64],
     message: String,
@@ -27,18 +40,22 @@ pub struct Transaction {
 
 impl Transaction {
     /// Generates a new `Transaction`.
-    /// In order to perform a new transaction, the sender must specify his account, his password,
-    /// the amount and the receiver's account.
     /// 
-    /// Every transaction contains:
-    /// - the sender's `Account`
-    /// - the receiver's `Account`
-    /// - the amount of the transaction
-    /// - the `DateTime<Utc>` time when the block was generated
-    /// - the SHA-512 hash of the sender's password
-    /// - the message to be signed
-    /// - the digital signature of the message
-    /// - the hash of the transaction
+    /// In order to perform a new transaction, the sender must specify his account, his password,
+    /// the amount to transfer and the receiver's account.
+    /// 
+    /// # Example
+    /// ```
+    /// # use blockchain::transaction::Transaction;
+    /// # use blockchain::account::Account;
+    /// let mut alvin = Account::new("Alvin", "Wilton", "alvin_wilton_1990#");
+    /// let egbert = Account::new("Egbert", "Tucker", "egby_tucky_PASS5000");
+    /// alvin.add_money(400.0);
+    /// 
+    /// let transaction = Transaction::new(alvin, egbert, 30.0, "alvin_wilton_1990#");
+    /// 
+    /// assert_eq!(transaction.amount(), 30.0);
+    /// ```
     pub fn new(sender: Account, receiver: Account, amount: f64, sender_password: &str) -> Self {
         let mut hasher = Sha512::new();
 
@@ -67,7 +84,38 @@ impl Transaction {
         transaction
     }
 
+    /// This method returns the amount of the transaction, since the `amount` field isn't `pub`.
+    /// 
+    /// # Example
+    /// ```
+    /// # use blockchain::transaction::Transaction;
+    /// # use blockchain::account::Account;
+    /// let mut chloe = Account::new("Chloe", "Savage", "KloeeSavageTrue1234");
+    /// let zoey = Account::new("Zoey", "Jacobson", "ZoomingPassword000#");
+    /// chloe.add_money(300.0);
+    /// 
+    /// let transaction = Transaction::new(chloe, zoey, 20.0, "KloeeSavageTrue1234");
+    /// 
+    /// assert_eq!(transaction.amount(), 20.0);
+    /// ```
+    pub fn amount(&self) -> f64 {
+        self.amount
+    }
+
     /// This method returns the hash of the transaction, since the `hash` field isn't `pub`.
+    /// 
+    /// # Example
+    /// ```
+    /// # use blockchain::transaction::Transaction;
+    /// # use blockchain::account::Account;
+    /// let mut luke = Account::new("Luke", "Steffen", "Luke_Steffen999");
+    /// let jerold = Account::new("Jerold", "Butcher", "Jer0ld_Butcher1000##");
+    /// luke.add_money(70.0);
+    /// 
+    /// let transaction = Transaction::new(luke, jerold, 10.0, "Luke_Steffen999");
+    /// 
+    /// assert_eq!(transaction.hash().len(), 64);
+    /// ```
     pub fn hash(&self) -> [u8; 64] {
         self.hash
     }
@@ -119,7 +167,27 @@ impl Transaction {
     /// - If the signature verification doesn't succeed,
     /// a `ValidationError::InvalidSign` error is returned.
     /// - If the amount is zero or negative, or if the amount of the transaction is more than the sender's balance,
-    /// a `ValidationError::InvalidAmount` error is returned. 
+    /// a `ValidationError::InvalidAmount` error is returned.
+    /// 
+    /// # Example
+    /// ```
+    /// # use blockchain::transaction::{Transaction, ValidationError};
+    /// # use blockchain::account::Account;
+    /// let mut odin = Account::new("Odin", "Dennell", "OdinDennellPass102938");
+    /// let kenya = Account::new("Kenya", "Dawson", "kenyyyya_dawwwwson69");
+    /// odin.add_money(10.0);
+    /// 
+    /// // cloning accounts because `Account` doesn't implement the `Copy` trait
+    /// let valid_transaction = Transaction::new(odin.clone(), kenya.clone(), 5.0, "OdinDennellPass102938");
+    /// 
+    /// assert_eq!(valid_transaction.validate(valid_transaction.hash()).unwrap(), ()); // if the transaction is valid `()` is returned
+    /// 
+    /// assert_eq!(kenya.balance(), 0.0); // as you can see kenya still has no money (see definition of the struct for reference)
+    /// 
+    /// let invalid_transaction = Transaction::new(kenya, odin, 80.0, "kenyyyya_dawwwwson69");
+    /// 
+    /// assert_eq!(invalid_transaction.validate(invalid_transaction.hash()), Err(ValidationError::InvalidAmount));
+    /// ```
     pub fn validate(&self, hash: [u8; 64]) -> Result<(), ValidationError> {
         let signature = Signature::try_from(self.signature).expect("Error generating the Signature while validating the transaction.");
 
@@ -140,7 +208,7 @@ impl Transaction {
 }
 
 /// An enum to handle errors generated while validating `Transaction`s.
-#[derive(Debug)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ValidationError {
     Tempered,
     WrongPassword,
