@@ -5,6 +5,15 @@ use crate::{
 };
 
 /// A struct to handle the blockchain of the currency.
+/// 
+/// The treansaction contains:
+/// - the index of the last block put in the chain
+/// - the chain of `Block`s
+/// - the pending transactions, already validated, waiting to be put in a new block
+/// - the number of transactions per block
+/// 
+/// When the blockchain is created, it comes with the genesis block already put in the chain,
+/// and the genesis is derived from the `Default` implementation of the `Block`.
 #[derive(Debug, Clone, PartialEq)]
 pub struct BlockChain {
     pub index: usize,
@@ -15,15 +24,6 @@ pub struct BlockChain {
 
 impl BlockChain {
     /// Generates a new `BlockChain`.
-    /// 
-    /// The treansaction contains:
-    /// - the index of the last block put in the chain
-    /// - the chain of `Block`s
-    /// - the pending transactions, already validated, waiting to be put in a new block
-    /// - the number of transactions per block
-    /// 
-    /// When the blockchain is created, it comes with the genesis block already put in the chain,
-    /// and the genesis is derived from the `Default` implementation of the `Block`.
     /// 
     /// # Example
     /// ```
@@ -86,20 +86,20 @@ impl BlockChain {
                     e,
                     transaction.sender,
                     transaction.receiver,
-                    transaction.amount,
+                    transaction.amount(),
                 ),
                 ValidationError::WrongPassword => eprintln!("{} Details: the sender's password is not correct.", e),
                 ValidationError::InvalidSignature => eprintln!("{} Details: transaction from {} to {}, for an amount of {}, wasn't validated because of invalid signature.",
                     e,
                     transaction.sender,
                     transaction.receiver,
-                    transaction.amount,
+                    transaction.amount(),
                 ),
                 ValidationError::InvalidAmount => eprintln!("{} Details: transaction from {} to {}, for an amount of {}, wasn't validated because of an invalid amount.",
                     e,
                     transaction.sender,
                     transaction.receiver,
-                    transaction.amount,
+                    transaction.amount(),
                 ),
             },
         };
