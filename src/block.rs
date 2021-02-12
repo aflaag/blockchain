@@ -4,6 +4,15 @@ use sha2::{Sha512, Digest};
 use chrono::{DateTime, Utc};
 
 /// A structure to handle blocks for the blockchain of the currency.
+/// 
+/// Every block of the chain contains:
+/// - the index (the #0 block is the genesis block)
+/// - the SHA-512 hash of the previous block
+/// - the transactions of the block
+/// (the number of transactions per block is set while generating the blockchain)
+/// - the nonce, which is used for the proof of work
+/// - the `DateTime<Utc>` time when the block was generated
+/// - the hash of the block generated
 #[derive(Debug, Clone, PartialEq)]
 pub struct Block {
     index: usize,
@@ -16,14 +25,22 @@ pub struct Block {
 
 impl Block {
     /// Generates a new `Block`.
-    /// Every block of the chain contains:
-    /// - the index (the #0 block is the genesis block)
-    /// - the SHA-512 hash of the previous block
-    /// - the transactions of the block
-    /// (the number of transactions per block is set while generating the blockchain)
-    /// - the nonce, which is used for the proof of work
-    /// - the `DateTime<Utc>` time when the block was generated
-    /// - the hash of the block generated
+    /// 
+    /// # Example
+    /// ```
+    /// # use blockchain::{block::Block, transaction::Transaction, account::Account};
+    /// let mut glenn = Account::new("Glenn", "Paris", "glenn_paris_PassWord88");
+    /// let william = Account::new("William", "Brown", "WilliamTheConqueror22");
+    /// glenn.add_money(20.0);
+    /// 
+    /// let transaction = Transaction::new(glenn, william, 20.0, "glenn_paris_PassWord88");
+    ///
+    /// let genesis = Block::default(); // that's the actual genesis block
+    ///
+    /// let new_block = Block::new(1, genesis.hash(), vec![transaction]);
+    /// 
+    /// assert_eq!(new_block.index(), 1);
+    /// ```
     pub fn new(index: usize, prev_hash: [u8; 64], transactions: Vec<Transaction>) -> Self {
         let mut block = Self {
             index,
@@ -39,9 +56,31 @@ impl Block {
         block
     }
 
-    /// This method returns the balance of the account, since the `balance` field isn't `pub`.
+    /// This method returns the hash of the block, since the `hash` field isn't `pub`.
+    /// 
+    /// # Example
+    /// ```
+    /// # use blockchain::block::Block;
+    /// let genesis_block = Block::default();
+    /// 
+    /// assert_eq!(genesis_block.hash().len(), 64); // the hash changes everytime because of the time
+    /// ```
     pub fn hash(&self) -> [u8; 64] {
         self.hash
+    }
+
+    /// This method returns the index of the block, since the `index` field isn't `pub`.
+    /// 
+    /// # Example
+    /// ```
+    /// # use blockchain::block::Block;
+    /// let genesis_block = Block::default();
+    /// 
+    /// assert_eq!(genesis_block.index(), 0);
+    /// ```
+    #[allow(dead_code)]
+    pub fn index(&self) -> usize {
+        self.index
     }
 
     /// This method is called when a new block is generated,
