@@ -6,6 +6,11 @@ use ed25519_dalek::Keypair;
 use crate::positive_f64::PositiveF64;
 
 /// A structure to handle accounts for the currency.
+/// 
+/// Every account has a first name, a last name, a balance (set to 0.0) and a password,
+/// which is used to validate the transactions; the password is saved using the SHA-512 hashing algorithm.
+/// Also, every account has a `Keypair` which is used to validate the signature of the transaction,
+/// using the `ed25519_dalek` crate.
 #[derive(Debug, Clone, PartialEq)]
 pub struct Account {
     first_name: String,
@@ -17,10 +22,6 @@ pub struct Account {
 
 impl Account {
     /// Generates a new `Account`.
-    /// Every account has a first name, a last name, a balance (set to 0.0) and a password,
-    /// which is used to validate the transactions; the password is saved using the SHA-512 hashing algorithm.
-    /// Also, every account has a `Keypair` which is used to validate the signature of the transaction,
-    /// using the `ed25519_dalek` crate.
     /// 
     /// # Example
     /// ```
