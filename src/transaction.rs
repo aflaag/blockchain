@@ -182,7 +182,7 @@ impl Transaction {
     /// 
     /// assert_eq!(valid_transaction.validate(valid_transaction.hash()).unwrap(), ()); // if the transaction is valid `()` is returned
     /// 
-    /// assert_eq!(kenya.balance(), 0.0); // as you can see kenya still has no money (see definition of the struct for reference)
+    /// assert_eq!(kenya.balance(), 0.0); // as you can see Kenya still has no money (check the definition of the struct for reference)
     /// 
     /// let invalid_transaction = Transaction::new(kenya, odin, 80.0, "kenyyyya_dawwwwson69");
     /// 
