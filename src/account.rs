@@ -26,7 +26,7 @@ impl Account {
     /// # Example
     /// ```
     /// # use blockchain::account::Account;
-    /// let ferris = Account::new("Ferris", "Rusty", "I_Love_Ferris_123!#"); // make sure your password is safe enough!
+    /// let ferris = Account::new("Ferris", "Rusty", "I_Love_Ferris_123#@_!$%&/"); // make sure your password is safe enough!
     /// 
     /// assert_eq!(ferris.balance(), 0.0); // your balance is 0.0 when the account is created
     /// ```
